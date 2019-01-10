@@ -1,0 +1,55 @@
+---
+title: "Choosing trios to sequence"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+```
+
+```{r load_coriell_trios}
+d = read_csv("../../data/popcontrols.csv")
+```
+
+```{r products}
+d %>% group_by(Product) %>% count()
+```
+
+```{r culture_sources}
+d %>% group_by(Source) %>% count()
+```
+
+```{r family_structure}
+d %>% group_by(`Subject Type`) %>% count(sort=TRUE)
+```
+
+```{r backgrounds}
+#d %>% filter(Source != "B-Lymphocyte", `Subject Type` == "trio", Product == 'DNA') %>% group_by(Race) %>% count(sort=TRUE)
+d %>% filter(Source != "B-Lymphocyte", Product == 'DNA') %>% group_by(Race) %>% count(sort=TRUE)
+```
+
+```{r backgrounds_filtered}
+#d %>% filter(Source != "B-Lymphocyte", `Subject Type` == "trio", Product == 'DNA', Race != "Caucasian", Race != "More than one race", Race != "Other", Race != "Unknown", Race != "Not Reported", !is.na(Race)) %>% group_by(Race) %>% count(sort=TRUE)
+d %>% filter(Source != "B-Lymphocyte", Product == 'DNA', Race != "Caucasian", Race != "More than one race", Race != "Other", Race != "Unknown", Race != "Not Reported", !is.na(Race)) %>% group_by(Race) %>% count(sort=TRUE)
+```
+
+```{r families}
+#f = d %>% filter(Source != "B-Lymphocyte", `Subject Type` == "trio", Product == 'DNA', Race != "Caucasian", Race != "More than one race", Race != "Other", Race != "Unknown", Race != "Not Reported", !is.na(Race)) %>% group_by(Family) %>% count() %>% filter(n >= 3) %>% pull(Family)
+f = d %>% filter(Source != "B-Lymphocyte", Product == 'DNA', Race != "Caucasian", Race != "More than one race", Race != "Other", Race != "Unknown", Race != "Not Reported", !is.na(Race)) %>% group_by(Family) %>% count() %>% filter(n >= 3) %>% pull(Family)
+d %>% filter(Source != "B-Lymphocyte", Product == 'DNA', Race != "Caucasian", Race != "More than one race", Race != "Other", Race != "Unknown", Race != "Not Reported", !is.na(Race)) %>% group_by(Family) %>% count() %>% print(n=100)
+```
+
+```{r samples}
+s = d %>% filter(Source != "B-Lymphocyte", `Subject Type` == "trio", Product == 'DNA', Race != "Caucasian", Race != "More than one race", Race != "Other", Race != "Unknown", Race != "Not Reported", !is.na(Race), Family %in% f) %>% arrange(Family)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
